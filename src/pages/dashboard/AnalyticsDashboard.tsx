@@ -38,7 +38,7 @@ export default function AnalyticsDashboard() {
                             <YAxis yAxisId="revenue" orientation="left" tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v / 1000}k`} />
                             <YAxis yAxisId="sales" orientation="right" tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} />
                             <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid rgba(196,98,45,0.2)', background: 'rgba(255,248,240,0.98)' }}
-                                formatter={(v: number, name: string) => [name === 'revenue' ? formatCurrency(v) : v, name === 'revenue' ? 'Revenue' : 'Sales']} />
+                                formatter={(v: number | undefined, name: string | undefined) => [name === 'revenue' ? formatCurrency(v ?? 0) : (v ?? 0), name === 'revenue' ? 'Revenue' : 'Sales']} />
                             <Area yAxisId="revenue" type="monotone" dataKey="revenue" stroke="#C4622D" strokeWidth={2} fill="url(#revenueGrad2)" />
                             <Area yAxisId="sales" type="monotone" dataKey="sales" stroke="#F4A026" strokeWidth={2} fill="url(#salesGrad)" />
                         </AreaChart>
@@ -97,7 +97,7 @@ export default function AnalyticsDashboard() {
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(196,98,45,0.07)" horizontal={false} />
                             <XAxis type="number" tick={{ fontSize: 10, fill: '#6B4423' }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v / 1000}k`} />
                             <YAxis type="category" dataKey="title" tick={{ fontSize: 10, fill: '#6B4423' }} axisLine={false} tickLine={false} width={100} />
-                            <Tooltip formatter={(v: number) => [formatCurrency(v), 'Revenue']} contentStyle={{ borderRadius: 12, border: '1px solid rgba(196,98,45,0.2)', background: 'rgba(255,248,240,0.98)' }} />
+                            <Tooltip formatter={(v: number | undefined) => [formatCurrency(v ?? 0), 'Revenue']} contentStyle={{ borderRadius: 12, border: '1px solid rgba(196,98,45,0.2)', background: 'rgba(255,248,240,0.98)' }} />
                             <Bar dataKey="revenue" fill="#C4622D" radius={4} />
                         </BarChart>
                     </ResponsiveContainer>

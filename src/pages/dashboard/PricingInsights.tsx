@@ -80,7 +80,7 @@ export default function PricingInsights() {
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(196,98,45,0.08)" />
                             <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} />
                             <YAxis tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v / 1000}k`} />
-                            <Tooltip formatter={(v: number) => [formatCurrency(v), 'Price']} contentStyle={{ borderRadius: 12, border: '1px solid rgba(196,98,45,0.2)', background: 'rgba(255,248,240,0.95)' }} />
+                            <Tooltip formatter={(v: number | undefined) => [formatCurrency(v ?? 0), 'Price']} contentStyle={{ borderRadius: 12, border: '1px solid rgba(196,98,45,0.2)', background: 'rgba(255,248,240,0.95)' }} />
                             <Line type="monotone" dataKey="price" stroke="#C4622D" strokeWidth={2.5} dot={{ fill: '#C4622D', r: 4 }} />
                         </LineChart>
                     </ResponsiveContainer>
@@ -120,7 +120,7 @@ export default function PricingInsights() {
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(196,98,45,0.08)" horizontal={false} />
                         <XAxis type="number" tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v / 1000}k`} />
                         <YAxis type="category" dataKey="platform" tick={{ fontSize: 12, fill: '#6B4423' }} axisLine={false} tickLine={false} width={60} />
-                        <Tooltip formatter={(v: number) => [formatCurrency(v)]} contentStyle={{ borderRadius: 12, border: '1px solid rgba(196,98,45,0.2)', background: 'rgba(255,248,240,0.95)' }} />
+                        <Tooltip formatter={(v: number | undefined) => [formatCurrency(v ?? 0)]} contentStyle={{ borderRadius: 12, border: '1px solid rgba(196,98,45,0.2)', background: 'rgba(255,248,240,0.95)' }} />
                         <Bar dataKey="min" fill="rgba(196,98,45,0.3)" radius={4} name="Min" />
                         <Bar dataKey="max" fill="#C4622D" radius={4} name="Max" />
                     </BarChart>

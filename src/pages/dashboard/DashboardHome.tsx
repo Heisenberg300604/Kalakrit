@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { mockArtisan, mockProducts, mockOrders, mockAnalytics, mockActivity } from '../../services/mockData';
+import { mockArtisan, mockOrders, mockAnalytics, mockActivity } from '../../services/mockData';
 import { formatCurrency, formatNumber, timeAgo } from '../../lib/utils';
 
 const StatCard = ({ icon, label, value, change, color }: { icon: string; label: string; value: string; change: string; color: string }) => (
@@ -59,7 +59,7 @@ export default function DashboardHome() {
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(196,98,45,0.08)" />
                             <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} />
                             <YAxis tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v / 1000}k`} />
-                            <Tooltip formatter={(v: number) => [formatCurrency(v), 'Revenue']} contentStyle={{ borderRadius: 12, border: '1px solid rgba(196,98,45,0.2)', background: 'rgba(255,248,240,0.95)' }} />
+                            <Tooltip formatter={(v: number | undefined) => [formatCurrency(v ?? 0), 'Revenue']} contentStyle={{ borderRadius: 12, border: '1px solid rgba(196,98,45,0.2)', background: 'rgba(255,248,240,0.95)' }} />
                             <Area type="monotone" dataKey="revenue" stroke="#C4622D" strokeWidth={2} fill="url(#revenueGrad)" />
                         </AreaChart>
                     </ResponsiveContainer>
@@ -155,8 +155,8 @@ export default function DashboardHome() {
                                     <td className="py-3 text-right font-semibold text-[--text-primary]">{formatCurrency(order.amount)}</td>
                                     <td className="py-3 text-right">
                                         <span className={`text-xs px-2 py-1 rounded-full font-medium ${order.status === 'delivered' ? 'badge-green' :
-                                                order.status === 'shipped' ? 'badge-indigo' :
-                                                    order.status === 'processing' ? 'badge-saffron' : 'badge-terracotta'
+                                            order.status === 'shipped' ? 'badge-indigo' :
+                                                order.status === 'processing' ? 'badge-saffron' : 'badge-terracotta'
                                             }`}>
                                             {order.status}
                                         </span>

@@ -1,8 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
     Mic, ChevronRight, Globe, BookOpen, TrendingUp, Package,
-    BarChart2, ShieldCheck, Languages, ArrowRight, Menu, X
+    BarChart2, ShieldCheck, Languages, Menu, X
 } from 'lucide-react';
 import { useLang } from '../hooks/useLanguage';
 import type { Language } from '../types';
@@ -104,7 +104,7 @@ export default function LandingPage() {
     const [scrolled, setScrolled] = useState(false);
     const [showLangMenu, setShowLangMenu] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const navigate = useNavigate();
+
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 40);

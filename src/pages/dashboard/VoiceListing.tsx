@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { mockVoiceListingResult, mockArtisan } from '../../services/mockData';
+import { mockVoiceListingResult } from '../../services/mockData';
 import { formatCurrency } from '../../lib/utils';
 
 type Step = 'idle' | 'recording' | 'processing' | 'done';
