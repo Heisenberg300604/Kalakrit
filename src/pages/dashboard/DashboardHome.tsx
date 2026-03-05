@@ -98,7 +98,7 @@ export default function DashboardHome() {
                             <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} />
                             <YAxis tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} />
                             <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid rgba(61,82,160,0.2)', background: 'rgba(255,248,240,0.95)' }} />
-                            <Line type="monotone" dataKey="demand" stroke="#3D52A0" strokeWidth={2} dot={{ fill: '#3D52A0', r: 3 }} />
+                            <Line type="monotone" dataKey="demand" stroke="#8B0000" strokeWidth={2} dot={{ fill: '#8B0000', r: 3 }} />
                             <Line type="monotone" dataKey="views" stroke="#F4A026" strokeWidth={2} dot={{ fill: '#F4A026', r: 3 }} />
                         </LineChart>
                     </ResponsiveContainer>

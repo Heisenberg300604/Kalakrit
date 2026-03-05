@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './hooks/useLanguage';
 import { AuthProvider } from './hooks/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import LandingPage from './pages/LandingPage';
+import LandingPageNew from './pages/LandingPageNew';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import MarketplacePage from './pages/MarketplacePage';
@@ -26,7 +26,7 @@ export default function App() {
       <LanguageProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<LandingPage />} />
+            <Route path="/" element={<LandingPageNew />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />

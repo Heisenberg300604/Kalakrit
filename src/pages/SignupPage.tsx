@@ -79,8 +79,8 @@ export default function SignupPage() {
                 <div className="text-center mb-8">
                     <Link to="/" className="inline-flex items-center gap-2.5 mb-6">
                         <svg viewBox="0 0 36 36" className="w-9 h-9" fill="none">
-                            <ellipse cx="18" cy="24" rx="10" ry="7" fill="#C4622D" opacity="0.15" />
-                            <path d="M18 4 C10 4 8 12 10 18 L18 32 L26 18 C28 12 26 4 18 4Z" fill="#C4622D" />
+                            <ellipse cx="18" cy="24" rx="10" ry="7" fill="#800000" opacity="0.15" />
+                            <path d="M18 4 C10 4 8 12 10 18 L18 32 L26 18 C28 12 26 4 18 4Z" fill="#800000" />
                             <path d="M14 14 Q18 10 22 14" stroke="#F4A026" strokeWidth="1.5" fill="none" />
                         </svg>
                         <span className="font-display text-2xl font-bold text-[--terracotta]">KalaKrit</span>
@@ -145,7 +145,7 @@ export default function SignupPage() {
                             <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Password</label>
                             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Create a strong password (min 6 chars)" required minLength={6} className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
                         </div>
-                        <button type="submit" disabled={loading} className="w-full py-3.5 rounded-xl text-white font-semibold transition-all hover:shadow-lg disabled:opacity-70 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
+                        <button type="submit" disabled={loading} className="w-full py-3.5 rounded-xl text-white font-semibold transition-all hover:shadow-lg disabled:opacity-70 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, #800000, #DC143C)' }}>
                             {loading ? <><Loader2 size={16} className="animate-spin" /> Creating...</> : <><Mic size={16} /> Create Account</>}
                         </button>
                     </form>
