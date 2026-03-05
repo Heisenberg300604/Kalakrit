@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { mockChatHistory, aiChatResponses } from '../../services/mockData';
+import { aiChatResponses, mockChatHistoryData, sampleGuidance } from '../../services/aiGuideData';
 import type { ChatMessage } from '../../types';
+import { TrendingUp, AlertCircle } from 'lucide-react';
 
 const quickQuestions = [
     { icon: '💰', label: 'Pricing advice', key: 'pricing' },
@@ -10,7 +11,8 @@ const quickQuestions = [
 ];
 
 export default function AICommerceGuide() {
-    const [messages, setMessages] = useState<ChatMessage[]>(mockChatHistory);
+    const [view, setView] = useState<'chat' | 'guidance'>('chat');
+    const [messages, setMessages] = useState<ChatMessage[]>(mockChatHistoryData as ChatMessage[]);
     const [input, setInput] = useState('');
     const [typing, setTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -57,11 +59,31 @@ export default function AICommerceGuide() {
     }
 
     return (
-        <div className="max-w-3xl mx-auto h-[calc(100vh-8rem)] flex flex-col gap-4">
+        <div className="space-y-4">
             <div>
                 <h1 className="font-display text-2xl sm:text-3xl font-bold text-[--text-primary]">AI Commerce Guide</h1>
                 <p className="text-[--text-secondary] text-sm mt-1">Your personal AI business mentor for pricing, marketing, and storytelling</p>
             </div>
+
+            <div className="flex gap-2">
+                <button
+                    onClick={() => setView('chat')}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${view === 'chat' ? 'text-white' : 'bg-white text-[--text-secondary] border border-[--border-warm]'}`}
+                    style={view === 'chat' ? { background: 'linear-gradient(135deg, #C4622D, #F4A026)' } : {}}
+                >
+                    💬 AI Chat
+                </button>
+                <button
+                    onClick={() => setView('guidance')}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${view === 'guidance' ? 'text-white' : 'bg-white text-[--text-secondary] border border-[--border-warm]'}`}
+                    style={view === 'guidance' ? { background: 'linear-gradient(135deg, #C4622D, #F4A026)' } : {}}
+                >
+                    📊 Sample Guidance
+                </button>
+            </div>
+
+            {view === 'chat' && (
+                <div className="max-w-3xl mx-auto h-[calc(100vh-12rem)] flex flex-col gap-4">
 
             {/* Quick topics */}
             <div className="flex flex-wrap gap-2">
@@ -131,6 +153,48 @@ export default function AICommerceGuide() {
                     </button>
                 </form>
             </div>
+                </div>
+            )}
+
+            {view === 'guidance' && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {Object.entries(sampleGuidance).map(([craft, data]) => (
+                        <div key={craft} className="bg-white rounded-2xl border border-[--border-warm] p-4 space-y-3">
+                            <div>
+                                <h3 className="font-semibold text-[--text-primary] capitalize">{craft.replace(/_/g, ' ')}</h3>
+                                <p className="text-xs text-[--text-secondary] mt-0.5">Sample AI insights for this craft category</p>
+                            </div>
+
+                            <div className="rounded-xl bg-[--warm-white] border border-[--border-warm] p-3 space-y-2">
+                                <div className="text-sm font-semibold text-[--text-primary] flex items-center gap-2">
+                                    <TrendingUp size={14} />
+                                    Pricing Recommendation
+                                </div>
+                                <p className="text-xs text-[--text-secondary]">
+                                    {data.pricingRecommendations[0]?.productName}: ₹{data.pricingRecommendations[0]?.currentPrice} → ₹{data.pricingRecommendations[0]?.recommendedPrice}
+                                </p>
+                                <p className="text-xs text-[--text-secondary] line-clamp-3">
+                                    {data.pricingRecommendations[0]?.reason}
+                                </p>
+                            </div>
+
+                            <div className="rounded-xl bg-[--warm-white] border border-[--border-warm] p-3 space-y-2">
+                                <div className="text-sm font-semibold text-[--text-primary] flex items-center gap-2">
+                                    <AlertCircle size={14} />
+                                    Marketing Tip
+                                </div>
+                                <p className="text-xs text-[--text-secondary] font-medium">{data.marketingTips[0]?.title}</p>
+                                <p className="text-xs text-[--text-secondary] line-clamp-3">{data.marketingTips[0]?.description}</p>
+                            </div>
+
+                            <div className="rounded-xl bg-[--warm-white] border border-[--border-warm] p-3">
+                                <p className="text-sm font-semibold text-[--text-primary] mb-1">Craft Story</p>
+                                <p className="text-xs text-[--text-secondary] line-clamp-4">{data.craftStoryEnhancement}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
