@@ -2,7 +2,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { mockAnalytics } from '../../services/mockData';
 import { formatCurrency } from '../../lib/utils';
 
-const COLORS = ['#C4622D', '#F4A026', '#3D52A0', '#7091E6'];
+const COLORS = ['#800000', '#DC143C', '#8B0000', '#CD5C5C'];
 
 export default function AnalyticsDashboard() {
     const data = mockAnalytics;
@@ -53,15 +53,15 @@ export default function AnalyticsDashboard() {
                         <AreaChart data={data.demandTrend}>
                             <defs>
                                 <linearGradient id="demandGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#3D52A0" stopOpacity={0.2} />
-                                    <stop offset="95%" stopColor="#3D52A0" stopOpacity={0} />
+                                    <stop offset="5%" stopColor="#8B0000" stopOpacity={0.2} />
+                                    <stop offset="95%" stopColor="#8B0000" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(61,82,160,0.07)" />
                             <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} />
                             <YAxis tick={{ fontSize: 11, fill: '#6B4423' }} axisLine={false} tickLine={false} />
                             <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid rgba(61,82,160,0.2)', background: 'rgba(255,248,240,0.98)' }} />
-                            <Area type="monotone" dataKey="demand" stroke="#3D52A0" strokeWidth={2} fill="url(#demandGrad)" name="Demand Score" />
+                            <Area type="monotone" dataKey="demand" stroke="#8B0000" strokeWidth={2} fill="url(#demandGrad)" name="Demand Score" />
                             <Area type="monotone" dataKey="views" stroke="#F4A026" strokeWidth={2} fill="none" strokeDasharray="4 2" name="Views" />
                         </AreaChart>
                     </ResponsiveContainer>

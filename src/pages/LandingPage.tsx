@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
-    Mic, ChevronRight, Globe, BookOpen, TrendingUp, Package,
+    Mic, Globe, BookOpen, TrendingUp, Package,
     BarChart2, ShieldCheck, Languages, Menu, X
 } from 'lucide-react';
 import { useLang } from '../hooks/useLanguage';
@@ -60,11 +60,9 @@ const features = [
 ];
 
 const steps = [
-    { num: '01', title: 'Speak in Your Language', desc: 'Press the microphone and describe your product in Hindi, Tamil, Telugu, Bengali, or English — exactly how you would tell a customer.' },
-    { num: '02', title: 'AI Generates the Listing', desc: 'Our AI instantly writes a professional product title, detailed description, and relevant tags — no typing needed.' },
-    { num: '03', title: 'AI Suggests Your Price', desc: 'Get data-backed price recommendations derived from demand trends, competitor data, and seasonal patterns.' },
-    { num: '04', title: 'AI Writes Your Craft Story', desc: 'A rich narrative is generated highlighting the heritage, technique, and artisan behind the product.' },
-    { num: '05', title: 'Publish Everywhere', desc: 'Your listing goes live across Amazon, Etsy, Flipkart, and Meesho with a single button — reach millions of buyers.' },
+    { num: '01', title: 'Kala (Craft)', desc: 'Speak your craft details in your mother tongue. AI creates a professional product listing with photos, descriptions, and tags.' },
+    { num: '02', title: 'Kathan (Story)', desc: 'AI weaves your heritage into compelling narratives that connect with global buyers and preserve cultural stories.' },
+    { num: '03', title: 'Karobaar (Business)', desc: 'Smart pricing, multi-marketplace publishing, and business insights help you grow your craft business globally.' },
 ];
 
 const stats = [
@@ -101,7 +99,7 @@ const impacts = [
 ];
 
 export default function LandingPage() {
-    const { lang, setLang } = useLang();
+    const { lang, setLang, t } = useLang();
     const { user } = useAuth();
     const [scrolled, setScrolled] = useState(false);
     const [showLangMenu, setShowLangMenu] = useState(false);
@@ -114,6 +112,55 @@ export default function LandingPage() {
         return () => window.removeEventListener('scroll', handler);
     }, []);
 
+    // Sticky horizontal scroll for How It Works section
+    useEffect(() => {
+        const section = document.getElementById('how-it-works');
+        const container = section?.querySelector('.sticky-scroll-content') as HTMLElement;
+
+        if (!section || !container) return;
+
+        const handleScroll = () => {
+            const rect = section.getBoundingClientRect();
+            const scrollProgress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / rect.height));
+
+            if (scrollProgress > 0 && scrollProgress < 1) {
+                // Calculate horizontal scroll based on vertical scroll progress
+                const maxScroll = container.scrollWidth - container.clientWidth;
+                container.scrollLeft = scrollProgress * maxScroll;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Audio player interaction
+    useEffect(() => {
+        const playBtn = document.querySelector('.audio-play-btn') as HTMLElement;
+        const player = document.querySelector('.bg-white\\/50') as HTMLElement;
+
+        if (!playBtn || !player) return;
+
+        const handlePlay = () => {
+            const isPlaying = player.classList.contains('audio-playing');
+            const playIcon = playBtn.querySelector('.play-icon') as HTMLElement;
+            const pauseIcon = playBtn.querySelector('.pause-icon') as HTMLElement;
+
+            if (isPlaying) {
+                player.classList.remove('audio-playing');
+                playIcon?.classList.remove('hidden');
+                pauseIcon?.classList.add('hidden');
+            } else {
+                player.classList.add('audio-playing');
+                playIcon?.classList.add('hidden');
+                pauseIcon?.classList.remove('hidden');
+            }
+        };
+
+        playBtn.addEventListener('click', handlePlay);
+        return () => playBtn.removeEventListener('click', handlePlay);
+    }, []);
+
     return (
         <div className="min-h-screen">
             {/* Navbar */}
@@ -122,18 +169,18 @@ export default function LandingPage() {
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-2.5">
                             <svg viewBox="0 0 36 36" className="w-8 h-8" fill="none">
-                                <ellipse cx="18" cy="24" rx="10" ry="7" fill="#C4622D" opacity="0.15" />
-                                <path d="M18 4 C10 4 8 12 10 18 L18 32 L26 18 C28 12 26 4 18 4Z" fill="#C4622D" />
+                                <ellipse cx="18" cy="24" rx="10" ry="7" fill="#702828" opacity="0.15" />
+                                <path d="M18 4 C10 4 8 12 10 18 L18 32 L26 18 C28 12 26 4 18 4Z" fill="#702828" />
                                 <path d="M14 14 Q18 10 22 14" stroke="#F4A026" strokeWidth="1.5" fill="none" />
                             </svg>
                             <span className="font-display text-xl font-bold text-[--terracotta]">KalaKrit</span>
                         </div>
 
                         <div className="hidden md:flex items-center gap-8">
-                            <Link to="/marketplace" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors font-medium">Marketplace</Link>
-                            <a href="#features" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors">Features</a>
-                            <a href="#how-it-works" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors">How it Works</a>
-                            <a href="#impact" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors">Impact</a>
+                            <Link to="/marketplace" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors font-medium">{t('Marketplace')}</Link>
+                            <a href="#features" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors">{t('Features')}</a>
+                            <a href="#how-it-works" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors">{t('How it Works')}</a>
+                            <a href="#impact" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors">{t('Impact')}</a>
                             <div className="relative">
                                 <button
                                     onClick={() => setShowLangMenu(!showLangMenu)}
@@ -167,13 +214,13 @@ export default function LandingPage() {
                         <div className="flex items-center gap-3">
                             {user ? (
                                 <Link to="/dashboard" className="text-sm px-4 py-2 rounded-full font-semibold text-white" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                                    Go to Dashboard
+                                    {t('Go to Dashboard')}
                                 </Link>
                             ) : (
                                 <>
-                                    <Link to="/login" className="hidden sm:block text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors font-medium">Log in</Link>
+                                    <Link to="/login" className="hidden sm:block text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors font-medium">{t('Log in')}</Link>
                                     <Link to="/signup" className="text-sm px-4 py-2 rounded-full font-semibold text-white" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                                        Get Started
+                                        {t('Get Started')}
                                     </Link>
                                 </>
                             )}
@@ -189,150 +236,223 @@ export default function LandingPage() {
                     <div className="md:hidden glass border-t border-[--border-warm] px-4 py-4 space-y-3">
                         {['Features', 'How it Works', 'Impact'].map(item => (
                             <a key={item} href={`#${item.toLowerCase().replace(/ /g, '-')}`} className="block text-sm font-medium text-[--text-secondary] hover:text-[--terracotta] py-1" onClick={() => setMobileMenuOpen(false)}>
-                                {item}
+                                {t(item)}
                             </a>
                         ))}
                     </div>
                 )}
             </nav>
 
-            {/* Hero Section */}
-            <section className="gradient-hero mandala-pattern min-h-screen flex items-center justify-center px-4 pt-16">
-                <div className="max-w-5xl mx-auto text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-[--border-warm] text-sm font-medium text-[--terracotta] mb-8 shadow-sm animate-fade-in-up">
-                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
-                        Voice-First · AI-Powered · Built for Indian Artisans
-                    </div>
-
-                    <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-[--text-primary] mb-6 leading-tight animate-fade-in-up stagger-1">
-                        Your <span style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Craft</span>,{' '}
-                        Your <span style={{ background: 'linear-gradient(135deg, #3D52A0, #7091E6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Voice</span>,{' '}
-                        Global Markets.
+            {/* Hero Section - Pure Typography */}
+            <section className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#F7F5F0' }}>
+                <div className="max-w-7xl mx-auto text-center">
+                    {/* Premium Typography Hierarchy */}
+                    <h1 className="font-display font-normal text-[--text-primary]" style={{ color: '#3A2618', fontSize: 'clamp(3rem, 8vw, 6rem)', lineHeight: '1.1' }}>
+                        From local streets to global feeds.<br />
+                        <span className="italic font-light" style={{ fontSize: 'clamp(4rem, 12vw, 9rem)', lineHeight: '0.9' }}>
+                            Heritage unmuted.
+                        </span>
                     </h1>
+                </div>
+            </section>
 
-                    <p className="text-lg sm:text-xl text-[--text-secondary] max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up stagger-2">
-                        Speak in your mother tongue. Our AI creates professional listings, suggests fair prices, and publishes your craft to Amazon, Etsy, and more — in under 60 seconds.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up stagger-3">
-                        <Link
-                            to="/signup"
-                            className="inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl text-white font-semibold text-lg shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
-                            style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}
-                        >
-                            <Mic size={20} /> Start Selling with Voice
-                        </Link>
-                        <a
-                            href="#how-it-works"
-                            className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold text-lg glass border border-[--border-warm] text-[--terracotta] hover:-translate-y-1 transition-all"
-                        >
-                            See How It Works <ChevronRight size={18} />
-                        </a>
-                    </div>
-
-                    <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 animate-fade-in-up stagger-4">
-                        {stats.map((stat) => (
-                            <div key={stat.label} className="glass rounded-2xl p-4 card-hover">
-                                <div className="font-display text-2xl sm:text-3xl font-bold text-[--terracotta]">{stat.value}</div>
-                                <div className="text-xs sm:text-sm text-[--text-secondary] mt-1">{stat.label}</div>
-                            </div>
-                        ))}
+            {/* Moving Text Marquee */}
+            <section className="py-6" style={{ backgroundColor: '#702828' }}>
+                <div className="overflow-hidden">
+                    <div className="animate-marquee whitespace-nowrap">
+                        <span className="text-white text-xl font-medium mx-8">KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR</span>
+                        <span className="text-white text-xl font-medium mx-8">KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR • KALA • KATHAN • KAROBAAR</span>
                     </div>
                 </div>
             </section>
 
             {/* Problem Section */}
-            <section className="py-24 px-4 bg-white">
+            <section className="py-24 px-4" style={{ backgroundColor: '#702828', color: 'white' }}>
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
-                        <span className="badge-terracotta inline-flex px-3 py-1 rounded-full text-sm font-medium mb-4">The Problem</span>
-                        <h2 className="font-display text-4xl sm:text-5xl font-bold text-[--text-primary]">Why Artisans Stay Invisible Online</h2>
-                        <p className="text-[--text-secondary] text-lg mt-4 max-w-2xl mx-auto">
-                            Despite making world-class crafts, millions of Indian artisans are cut off from digital markets — not because of their talent, but due to structural barriers.
+                        <span className="badge-terracotta inline-flex px-3 py-1 rounded-full text-sm font-medium mb-4">{t('The Problem')}</span>
+                        <h2 className="font-display text-4xl sm:text-5xl font-bold text-white">Why Artisans Stay Invisible Online</h2>
+                        <p className="text-white/80 text-lg mt-4 max-w-2xl mx-auto">
+                            {t('Despite making world-class crafts, millions of Indian artisans are cut off from digital markets — not because of their talent, but due to structural barriers.')}
                         </p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         {problems.map((p, i) => (
-                            <div key={i} className="p-6 rounded-2xl border border-[--border-warm] hover:shadow-lg transition-all card-hover bg-gradient-to-br from-white to-[--warm-white]">
-                                <div className="w-10 h-10 rounded-xl bg-[--beige] flex items-center justify-center mb-3 text-[--terracotta] font-bold font-display text-lg border border-[--border-warm]">
+                            <div key={i} className="p-6 rounded-2xl border border-white/20 hover:shadow-lg transition-all card-hover bg-white/5">
+                                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-3 text-white font-bold font-display text-lg border border-white/20">
                                     {String(i + 1).padStart(2, '0')}
                                 </div>
-                                <h3 className="font-semibold text-lg text-[--text-primary] mb-2">{p.title}</h3>
-                                <p className="text-[--text-secondary] text-sm leading-relaxed">{p.desc}</p>
+                                <h3 className="font-semibold text-lg text-white mb-2">{t(p.title)}</h3>
+                                <p className="text-white/70 text-sm leading-relaxed">{t(p.desc)}</p>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* How It Works */}
-            <section id="how-it-works" className="py-24 px-4 gradient-warm">
-                <div className="max-w-5xl mx-auto">
-                    <div className="text-center mb-16">
-                        <span className="badge-saffron inline-flex px-3 py-1 rounded-full text-sm font-medium mb-4">How It Works</span>
-                        <h2 className="font-display text-4xl sm:text-5xl font-bold text-[--text-primary]">From Voice to Live Listing in 60 Seconds</h2>
-                    </div>
-                    <div className="space-y-6">
-                        {steps.map((s, i) => (
-                            <div key={i} className={`flex gap-5 items-start ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
-                                <div className="flex-shrink-0 mt-1">
-                                    <div className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-white text-sm shadow-lg" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                                        {s.num}
-                                    </div>
-                                </div>
-                                <div className="glass rounded-2xl p-5 flex-1 card-hover border border-[--border-warm]">
-                                    <h3 className="font-semibold text-lg text-[--text-primary] mb-1.5">{s.title}</h3>
-                                    <p className="text-[--text-secondary] text-sm leading-relaxed">{s.desc}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Section */}
-            <section id="features" className="py-24 px-4 bg-white">
+            {/* Features Section - Clean Cards */}
+            <section className="py-24 px-4" style={{ backgroundColor: '#F5F5DC' }}>
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-16">
-                        <span className="badge-indigo inline-flex px-3 py-1 rounded-full text-sm font-medium mb-4">Features</span>
-                        <h2 className="font-display text-4xl sm:text-5xl font-bold text-[--text-primary]">Everything an Artisan Needs to Succeed Online</h2>
-                        <p className="text-[--text-secondary] mt-4 max-w-xl mx-auto">Built from the ground up for artisans who create beautiful things but shouldn't have to worry about the digital complexity of selling them.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Card 1: Voice-to-Listing */}
+                        <div className="p-8 border-2 border-[--terracotta] rounded-lg hover:bg-[--terracotta] hover:text-white transition-colors duration-200 group">
+                            <div className="w-12 h-12 rounded-lg bg-[--terracotta] flex items-center justify-center mb-6 group-hover:bg-white">
+                                <Mic size={24} className="text-white group-hover:text-[--terracotta]" />
+                            </div>
+                            <h3 className="font-semibold text-xl text-[--text-primary] mb-4 group-hover:text-white">Voice-to-Listing</h3>
+                            <p className="text-[--text-secondary] leading-relaxed group-hover:text-white/90">
+                                Speak in your mother tongue. AI creates professional marketplace listings instantly.
+                            </p>
+                        </div>
+
+                        {/* Card 2: AI Commerce Guide */}
+                        <div className="p-8 border-2 border-[--terracotta] rounded-lg hover:bg-[--terracotta] hover:text-white transition-colors duration-200 group">
+                            <div className="w-12 h-12 rounded-lg bg-[--terracotta] flex items-center justify-center mb-6 group-hover:bg-white">
+                                <BookOpen size={24} className="text-white group-hover:text-[--terracotta]" />
+                            </div>
+                            <h3 className="font-semibold text-xl text-[--text-primary] mb-4 group-hover:text-white">AI Commerce Guide</h3>
+                            <p className="text-[--text-secondary] leading-relaxed group-hover:text-white/90">
+                                Your personal business mentor for pricing, marketing, and growth strategies.
+                            </p>
+                        </div>
+
+                        {/* Card 3: Global Export */}
+                        <div className="p-8 border-2 border-[--terracotta] rounded-lg hover:bg-[--terracotta] hover:text-white transition-colors duration-200 group">
+                            <div className="w-12 h-12 rounded-lg bg-[--terracotta] flex items-center justify-center mb-6 group-hover:bg-white">
+                                <Globe size={24} className="text-white group-hover:text-[--terracotta]" />
+                            </div>
+                            <h3 className="font-semibold text-xl text-[--text-primary] mb-4 group-hover:text-white">Global Export</h3>
+                            <p className="text-[--text-secondary] leading-relaxed group-hover:text-white/90">
+                                One-click publishing to Amazon, Etsy, Flipkart, and international marketplaces.
+                            </p>
+                        </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {features.map((f, i) => {
-                            const Icon = f.icon;
-                            return (
-                                <div key={i} className="group p-5 rounded-2xl border border-[--border-warm] hover:shadow-xl transition-all card-hover cursor-default bg-white">
-                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                                        <Icon size={18} />
-                                    </div>
-                                    <h3 className="font-semibold text-[--text-primary] mb-2">{f.title}</h3>
-                                    <p className="text-sm text-[--text-secondary] leading-relaxed">{f.desc}</p>
+                </div>
+            </section>
+
+            {/* Artisan Spotlight */}
+            <section className="py-24 px-4 gradient-warm relative overflow-hidden">
+                {/* Parallax Background */}
+                <div className="absolute inset-0 parallax-bg opacity-10">
+                    <div className="w-full h-full bg-gradient-to-br from-[--beige] to-[--warm-white] flex items-center justify-center">
+                        <span className="text-9xl opacity-20">🧵</span>
+                    </div>
+                </div>
+
+                <div className="max-w-6xl mx-auto relative z-10">
+                    <div className="text-center mb-16">
+                        <span className="badge-terracotta inline-flex px-3 py-1 rounded-full text-sm font-medium mb-4">Artisan Spotlight</span>
+                        <h2 className="font-display text-4xl sm:text-5xl font-bold text-[--text-primary]">Meet the Masters</h2>
+                        <p className="text-[--text-secondary] mt-4 max-w-xl mx-auto text-lg">Real artisans sharing their stories and showcasing their craft through our voice-first platform.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        {/* Artisan Profile Card */}
+                        <div className="glass rounded-3xl p-8 card-hover border border-[--border-warm] relative">
+                            <div className="flex items-start gap-4 mb-6">
+                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[--beige] to-[--warm-white] flex items-center justify-center">
+                                    <span className="text-2xl">👩‍🎨</span>
                                 </div>
-                            );
-                        })}
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-xl text-[--text-primary] mb-1">Priya Sharma</h3>
+                                    <p className="text-[--text-secondary] text-sm mb-2">Banarasi Silk Weaver, Varanasi</p>
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2 py-1 rounded-full bg-[--terracotta]/10 text-[--terracotta] text-xs font-medium">15+ Years Experience</span>
+                                        <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">3× Income Growth</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <blockquote className="text-[--text-secondary] italic mb-6 leading-relaxed">
+                                "KalaKrit changed everything. I speak in Bhojpuri, and my sarees now reach customers in America and Europe. The AI understands my craft better than any middleman ever did."
+                            </blockquote>
+
+                            {/* Interactive Audio Player with Visualizer */}
+                            <div className="bg-white/50 rounded-2xl p-4 border border-[--border-warm] relative overflow-hidden">
+                                {/* Audio Visualizer Background */}
+                                <div className="absolute inset-0 opacity-0 audio-playing">
+                                    <div className="flex items-end justify-center h-full gap-1">
+                                        {[...Array(20)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="bg-[--terracotta]/30 rounded-full animate-audio-bar"
+                                                style={{
+                                                    width: '3px',
+                                                    height: `${Math.random() * 40 + 10}px`,
+                                                    animationDelay: `${i * 0.1}s`,
+                                                    animationDuration: `${0.5 + Math.random() * 0.5}s`
+                                                }}
+                                            ></div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 mb-3 relative z-10">
+                                    <div className="w-10 h-10 rounded-xl bg-[--terracotta] flex items-center justify-center">
+                                        <Mic size={16} className="text-white" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-medium text-[--text-primary]">Priya's Craft Story</div>
+                                        <div className="text-xs text-[--text-secondary]">2:34 • Recorded in Bhojpuri</div>
+                                    </div>
+                                    <button className="audio-play-btn w-8 h-8 rounded-full bg-[--terracotta] flex items-center justify-center hover:bg-[--terracotta]/80 transition-colors">
+                                        <span className="text-white text-sm play-icon">▶</span>
+                                        <span className="text-white text-sm pause-icon hidden">⏸</span>
+                                    </button>
+                                </div>
+                                <div className="w-full bg-white/30 rounded-full h-1.5 relative z-10">
+                                    <div className="bg-[--terracotta] h-1.5 rounded-full w-1/3 transition-all duration-300 audio-progress"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Product Showcase */}
+                        <div className="space-y-6">
+                            <div className="glass rounded-2xl p-6 card-hover border border-[--border-warm]">
+                                <div className="aspect-square bg-gradient-to-br from-[--beige] to-[--warm-white] rounded-xl mb-4 flex items-center justify-center">
+                                    <span className="text-4xl">🧵</span>
+                                </div>
+                                <h4 className="font-semibold text-lg text-[--text-primary] mb-2">Handwoven Banarasi Silk Saree</h4>
+                                <p className="text-[--text-secondary] text-sm mb-3">Traditional motifs with modern appeal, now available globally through 4 marketplaces.</p>
+                                <div className="flex items-center justify-between">
+                                    <span className="font-display text-xl font-bold text-[--terracotta]">₹12,500</span>
+                                    <span className="text-xs text-green-600 font-medium">Sold 47 pieces this month</span>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="glass rounded-xl p-4 card-hover border border-[--border-warm] text-center">
+                                    <div className="text-2xl font-bold text-[--terracotta] mb-1">47</div>
+                                    <div className="text-xs text-[--text-secondary]">Monthly Sales</div>
+                                </div>
+                                <div className="glass rounded-xl p-4 card-hover border border-[--border-warm] text-center">
+                                    <div className="text-2xl font-bold text-[--terracotta] mb-1">12</div>
+                                    <div className="text-xs text-[--text-secondary]">Countries Reached</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* Impact Section */}
-            <section id="impact" className="py-24 px-4" style={{ background: 'linear-gradient(135deg, #1A0A00 0%, #3D1C00 100%)' }}>
+            <section id="impact" className="py-24 px-4 gradient-warm">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium mb-4 badge-saffron">Impact</span>
-                        <h2 className="font-display text-4xl sm:text-5xl font-bold text-white">
-                            Transforming Lives,<br />Preserving Heritage
+                        <h2 className="font-display text-4xl sm:text-5xl font-bold text-[--text-primary]">
+                            {t('Transforming Lives, Preserving Heritage')}
                         </h2>
-                        <p className="text-white/60 mt-4 max-w-xl mx-auto text-lg">When artisans earn fairly and sell directly, entire communities thrive — and centuries-old crafts find new life across the world.</p>
+                        <p className="text-[--text-secondary] mt-4 max-w-xl mx-auto text-lg">{t('When artisans earn fairly and sell directly, entire communities thrive — and centuries-old crafts find new life across the world.')}</p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         {impacts.map((impact, i) => (
-                            <div key={i} className="glass-dark rounded-2xl p-6 card-hover">
-                                <div className="w-10 h-10 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center font-display font-bold text-[--saffron] text-sm mb-3">
+                            <div key={i} className="glass rounded-2xl p-6 card-hover">
+                                <div className="w-10 h-10 rounded-xl border border-[--border-warm] bg-[--beige] flex items-center justify-center font-display font-bold text-[--terracotta] text-sm mb-3">
                                     {String(i + 1).padStart(2, '0')}
                                 </div>
-                                <h3 className="font-semibold text-lg text-white mb-2">{impact.title}</h3>
-                                <p className="text-white/65 text-sm leading-relaxed">{impact.desc}</p>
+                                <h3 className="font-semibold text-lg text-[--text-primary] mb-2">{t(impact.title)}</h3>
+                                <p className="text-[--text-secondary] text-sm leading-relaxed">{t(impact.desc)}</p>
                             </div>
                         ))}
                     </div>
@@ -340,67 +460,58 @@ export default function LandingPage() {
             </section>
 
             {/* CTA Section */}
-            <section className="py-24 px-4 gradient-warm text-center">
+            <section className="py-24 px-4" style={{ backgroundColor: '#702828', color: 'white' }}>
                 <div className="max-w-3xl mx-auto">
                     <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-float" style={{ background: 'linear-gradient(135deg, rgba(196,98,45,0.12), rgba(244,160,38,0.08))' }}>
                         <svg viewBox="0 0 50 50" className="w-12 h-12" fill="none">
-                            <ellipse cx="25" cy="34" rx="14" ry="10" fill="#C4622D" opacity="0.12" />
-                            <path d="M25 4 C14 4 11 16 14 24 L25 44 L36 24 C39 16 36 4 25 4Z" fill="#C4622D" />
+                            <ellipse cx="25" cy="34" rx="14" ry="10" fill="#702828" opacity="0.12" />
+                            <path d="M25 4 C14 4 11 16 14 24 L25 44 L36 24 C39 16 36 4 25 4Z" fill="#702828" />
                             <path d="M19 18 Q25 12 31 18" stroke="#F4A026" strokeWidth="2" fill="none" />
                         </svg>
                     </div>
-                    <h2 className="font-display text-4xl sm:text-5xl font-bold text-[--text-primary] mb-4">Empower Your Craft</h2>
-                    <p className="text-lg text-[--text-secondary] mb-10 max-w-xl mx-auto leading-relaxed">
-                        Join thousands of artisans already growing their business online with KalaKrit. Free to start. Takes two minutes. Built entirely for you.
+                    <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">{t('Empower Your Craft')}</h2>
+                    <p className="text-white/80 mb-10 max-w-xl mx-auto leading-relaxed">
+                        {t('Join thousands of artisans already growing their business online with KalaKrit. Free to start. Takes two minutes. Built entirely for you.')}
                     </p>
                     <Link
                         to="/signup"
                         className="inline-flex items-center gap-2.5 px-10 py-5 rounded-2xl text-white font-semibold text-xl shadow-2xl hover:shadow-3xl transition-all hover:-translate-y-1"
-                        style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}
+                        style={{ background: 'linear-gradient(135deg, #DC143C, #CD5C5C)' }}
                     >
-                        <Mic size={22} /> Start Selling For Free
+                        <Mic size={22} /> {t('Start Selling For Free')}
                     </Link>
-                    <p className="text-sm text-[--text-secondary] mt-4">No credit card required — No technical skills needed</p>
+                    <p className="text-white/70 mt-4">{t('No credit card required — No technical skills needed')}</p>
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="bg-[#140a05] text-white/80 py-12 px-4">
-                <div className="max-w-6xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            {/* Footer - Clean and Simple */}
+            <footer className="py-16 px-4" style={{ backgroundColor: '#702828', color: 'white' }}>
+                <div className="max-w-4xl mx-auto text-center">
+                    <h3 className="font-semibold text-2xl mb-8">Coming Soon: Expanding Your Business Ecosystem</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
                         <div>
-                            <div className="flex items-center gap-2.5 mb-3">
-                                <svg viewBox="0 0 36 36" className="w-7 h-7" fill="none">
-                                    <ellipse cx="18" cy="24" rx="10" ry="7" fill="#F4A026" opacity="0.2" />
-                                    <path d="M18 4 C10 4 8 12 10 18 L18 32 L26 18 C28 12 26 4 18 4Z" fill="#F4A026" />
-                                    <path d="M14 14 Q18 10 22 14" stroke="white" strokeWidth="1.5" fill="none" />
-                                </svg>
-                                <span className="font-display text-xl font-bold text-white">KalaKrit</span>
-                            </div>
-                            <p className="text-sm text-white/55 leading-relaxed">AI-Powered Voice Marketplace for India's Local Artisans. Bridging Heritage and Digital Commerce.</p>
+                            <h4 className="font-medium text-lg mb-3">Micro-financing</h4>
+                            <p className="text-white/80 text-sm leading-relaxed">
+                                Access to small business loans and credit lines tailored for artisans and craft entrepreneurs.
+                            </p>
                         </div>
-                        {[
-                            { heading: 'Product', links: ['Voice Listing', 'AI Storytelling', 'Smart Pricing', 'Marketplace'] },
-                            { heading: 'Company', links: ['About Us', 'Blog', 'Press', 'Careers'] },
-                            { heading: 'Support', links: ['Help Center', 'Contact Us', 'Privacy Policy', 'Terms'] },
-                        ].map((col) => (
-                            <div key={col.heading}>
-                                <h4 className="font-semibold text-white mb-3">{col.heading}</h4>
-                                <ul className="space-y-2">
-                                    {col.links.map((link) => (
-                                        <li key={link}><a href="#" className="text-sm text-white/55 hover:text-white transition-colors">{link}</a></li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
+                        <div>
+                            <h4 className="font-medium text-lg mb-3">Insurance</h4>
+                            <p className="text-white/80 text-sm leading-relaxed">
+                                Comprehensive coverage for your craft business, inventory, and marketplace operations.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 className="font-medium text-lg mb-3">Events</h4>
+                            <p className="text-white/80 text-sm leading-relaxed">
+                                Virtual and physical craft fairs, workshops, and networking opportunities for artisans.
+                            </p>
+                        </div>
                     </div>
-                    <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <p className="text-sm text-white/45">© 2026 KalaKrit. Made with care for India's artisans.</p>
-                        <div className="flex gap-5">
-                            {['Twitter', 'Facebook', 'Instagram', 'LinkedIn'].map((s) => (
-                                <a key={s} href="#" className="text-sm text-white/55 hover:text-white transition-colors">{s}</a>
-                            ))}
-                        </div>
+                    <div className="mt-12 pt-8 border-t border-white/20">
+                        <p className="text-white/60 text-sm">
+                            © 2024 Kalakrit. Empowering artisans with AI-driven commerce.
+                        </p>
                     </div>
                 </div>
             </footer>

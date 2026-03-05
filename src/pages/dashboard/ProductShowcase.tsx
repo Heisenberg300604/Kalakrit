@@ -108,7 +108,7 @@ export default function ProductShowcase() {
                         <button
                             onClick={() => setArMode(true)}
                             className="flex-1 py-2 rounded-xl text-white text-sm font-medium transition-all"
-                            style={{ background: 'linear-gradient(135deg, #3D52A0, #7091E6)' }}
+                            style={{ background: 'linear-gradient(135deg, #8B0000, #CD5C5C)' }}
                         >
                             📱 AR Preview
                         </button>
