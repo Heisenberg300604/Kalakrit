@@ -1,4 +1,4 @@
--- ============================================================
+
 -- KalaKrit — Complete Supabase Schema Setup
 -- For Team Collaboration
 --
