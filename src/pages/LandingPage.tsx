@@ -5,6 +5,7 @@ import {
     BarChart2, ShieldCheck, Languages, Menu, X
 } from 'lucide-react';
 import { useLang } from '../hooks/useLanguage';
+import { useAuth } from '../hooks/AuthContext';
 import type { Language } from '../types';
 
 const languages: { code: Language; label: string; native: string }[] = [
@@ -101,6 +102,7 @@ const impacts = [
 
 export default function LandingPage() {
     const { lang, setLang } = useLang();
+    const { user } = useAuth();
     const [scrolled, setScrolled] = useState(false);
     const [showLangMenu, setShowLangMenu] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -128,6 +130,7 @@ export default function LandingPage() {
                         </div>
 
                         <div className="hidden md:flex items-center gap-8">
+                            <Link to="/marketplace" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors font-medium">Marketplace</Link>
                             <a href="#features" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors">Features</a>
                             <a href="#how-it-works" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors">How it Works</a>
                             <a href="#impact" className="text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors">Impact</a>
@@ -140,14 +143,20 @@ export default function LandingPage() {
                                     {languages.find(l => l.code === lang)?.native}
                                 </button>
                                 {showLangMenu && (
-                                    <div className="absolute right-0 mt-2 w-40 glass rounded-xl shadow-xl border border-[--border-warm] z-50 overflow-hidden">
+                                    <div className="absolute right-0 mt-2 w-48 glass rounded-xl shadow-xl border border-[--border-warm] z-50 overflow-hidden">
+                                        <div className="px-3 py-2 text-[10px] uppercase tracking-wide text-[--text-secondary]/70 border-b border-[--border-warm]">
+                                            Preferred Language
+                                        </div>
                                         {languages.map(l => (
                                             <button
                                                 key={l.code}
                                                 onClick={() => { setLang(l.code); setShowLangMenu(false); }}
-                                                className={`w-full text-left px-4 py-2 text-sm hover:bg-[--beige] transition-colors ${lang === l.code ? 'text-[--terracotta] font-semibold' : 'text-[--text-secondary]'}`}
+                                                className={`w-full flex items-center justify-between px-4 py-2 text-sm hover:bg-[--beige] transition-colors ${
+                                                    lang === l.code ? 'text-[--terracotta] font-semibold' : 'text-[--text-secondary]'
+                                                }`}
                                             >
-                                                {l.native}
+                                                <span>{l.native}</span>
+                                                {lang === l.code && <span className="text-[--terracotta] text-xs">●</span>}
                                             </button>
                                         ))}
                                     </div>
@@ -156,10 +165,18 @@ export default function LandingPage() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <Link to="/login" className="hidden sm:block text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors font-medium">Log in</Link>
-                            <Link to="/signup" className="text-sm px-4 py-2 rounded-full font-semibold text-white" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                                Get Started
-                            </Link>
+                            {user ? (
+                                <Link to="/dashboard" className="text-sm px-4 py-2 rounded-full font-semibold text-white" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
+                                    Go to Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link to="/login" className="hidden sm:block text-sm text-[--text-secondary] hover:text-[--terracotta] transition-colors font-medium">Log in</Link>
+                                    <Link to="/signup" className="text-sm px-4 py-2 rounded-full font-semibold text-white" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
+                                        Get Started
+                                    </Link>
+                                </>
+                            )}
                             <button className="md:hidden p-1 text-[--text-secondary]" onClick={() => setMobileMenuOpen(v => !v)}>
                                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                             </button>
@@ -348,7 +365,7 @@ export default function LandingPage() {
             </section>
 
             {/* Footer */}
-            <footer className="bg-[--text-primary] text-white/80 py-12 px-4">
+            <footer className="bg-[#140a05] text-white/80 py-12 px-4">
                 <div className="max-w-6xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                         <div>
@@ -378,7 +395,7 @@ export default function LandingPage() {
                         ))}
                     </div>
                     <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <p className="text-sm text-white/45">© 2024 KalaKrit. Made with care for India's artisans.</p>
+                        <p className="text-sm text-white/45">© 2026 KalaKrit. Made with care for India's artisans.</p>
                         <div className="flex gap-5">
                             {['Twitter', 'Facebook', 'Instagram', 'LinkedIn'].map((s) => (
                                 <a key={s} href="#" className="text-sm text-white/55 hover:text-white transition-colors">{s}</a>

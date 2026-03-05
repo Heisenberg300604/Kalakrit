@@ -1,20 +1,71 @@
-import { useState } from 'react';
-import { mockArtisan } from '../../services/mockData';
+import { useEffect, useState } from 'react';
+import { Mail, Phone, Globe2, CalendarRange, Image as ImageIcon, Edit2, Award, Package, ShoppingBag, IndianRupee } from 'lucide-react';
 import { formatCurrency } from '../../lib/utils';
+import { useAuth } from '../../hooks/AuthContext';
+import supabase from '../../utils/supabase';
 
 export default function ProfilePage() {
+    const { user } = useAuth();
     const [editing, setEditing] = useState(false);
-    const [name, setName] = useState(mockArtisan.name);
-    const [bio, setBio] = useState(mockArtisan.bio);
+    const [name, setName] = useState('');
+    const [bio] = useState('');
+    const [phone, setPhone] = useState('');
+    const [craft, setCraft] = useState('');
+    const [location, setLocation] = useState('');
+    const [language, setLanguage] = useState('');
+    const [joinedAt, setJoinedAt] = useState<Date | null>(null);
     const [saved, setSaved] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    function handleSave() {
-        setEditing(false);
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2500);
+    useEffect(() => {
+        async function loadProfile() {
+            if (!user) return;
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('full_name, phone, craft, location, language, created_at')
+                .eq('id', user.id)
+                .single();
+
+            if (!error && data) {
+                setName(data.full_name || user.user_metadata?.full_name || user.email || '');
+                setPhone(data.phone || '');
+                setCraft(data.craft || '');
+                setLocation(data.location || '');
+                setLanguage(data.language || 'en');
+                setJoinedAt(data.created_at ? new Date(data.created_at) : null);
+            } else {
+                setName(user.user_metadata?.full_name || user.email || '');
+            }
+            setLoading(false);
+        }
+
+        loadProfile();
+    }, [user]);
+
+    async function handleSave() {
+        if (!user) return;
+        setSaved(false);
+
+        const { error } = await supabase
+            .from('profiles')
+            .upsert({
+                id: user.id,
+                full_name: name,
+                phone,
+                craft,
+                location,
+                language,
+            }, { onConflict: 'id' });
+
+        if (!error) {
+            setEditing(false);
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2500);
+        }
     }
 
-    const badges = ['GI Tagged Artisan', 'Verified Seller', 'Top Rated', '1+ Year Active'];
+    const badges = ['Verified Artisan', 'Direct-to-Market', 'Profile Complete'];
 
     return (
         <div className="space-y-6 max-w-3xl mx-auto">
@@ -29,15 +80,15 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            {/* Profile card */}
+                {/* Profile card */}
             <div className="bg-white rounded-2xl p-6 border border-[--border-warm]">
                 <div className="flex flex-col sm:flex-row gap-6">
                     <div className="flex flex-col items-center gap-3">
                         <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-4xl font-bold text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                            {name.charAt(0)}
+                            {(name || user?.email || 'A').charAt(0).toUpperCase()}
                         </div>
                         <button className="text-xs px-3 py-1.5 rounded-xl border border-[--border-warm] text-[--text-secondary] hover:border-[--terracotta] hover:text-[--terracotta] transition-all">
-                            📷 Change Photo
+                            <ImageIcon size={12} className="inline mr-1" /> Change Photo
                         </button>
                     </div>
 
@@ -49,29 +100,51 @@ export default function ProfilePage() {
                                     <input value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-[--border-warm] text-[--text-primary] focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 transition-all" />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold text-[--text-secondary] mb-1.5 block uppercase tracking-wide">Bio</label>
-                                    <textarea rows={3} value={bio} onChange={e => setBio(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-[--border-warm] text-[--text-primary] focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 transition-all resize-none text-sm" />
+                                    <label className="text-xs font-semibold text-[--text-secondary] mb-1.5 block uppercase tracking-wide">Craft</label>
+                                    <input value={craft} onChange={e => setCraft(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-[--border-warm] text-[--text-primary] focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 transition-all" />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-[--text-secondary] mb-1.5 block uppercase tracking-wide">Location</label>
+                                    <input value={location} onChange={e => setLocation(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-[--border-warm] text-[--text-primary] focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 transition-all" />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs font-semibold text-[--text-secondary] mb-1.5 block uppercase tracking-wide">Phone</label>
+                                        <input value={phone} onChange={e => setPhone(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-[--border-warm] text-[--text-primary] focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 transition-all" />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-[--text-secondary] mb-1.5 block uppercase tracking-wide">Preferred Language</label>
+                                        <input value={language} onChange={e => setLanguage(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-[--border-warm] text-[--text-primary] focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 transition-all" />
+                                    </div>
                                 </div>
                                 <div className="flex gap-2">
                                     <button onClick={handleSave} className="px-5 py-2 rounded-xl text-white text-sm font-semibold" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>Save Changes</button>
                                     <button onClick={() => setEditing(false)} className="px-5 py-2 rounded-xl border border-[--border-warm] text-[--text-secondary] text-sm font-semibold hover:bg-[--warm-white] transition-all">Cancel</button>
                                 </div>
                             </>
+                        ) : loading ? (
+                            <p className="text-sm text-[--text-secondary]">Loading profile...</p>
                         ) : (
                             <>
                                 <div className="flex items-start justify-between">
                                     <div>
-                                        <h2 className="font-display text-xl font-bold text-[--text-primary]">{name}</h2>
-                                        <p className="text-[--text-secondary] text-sm mt-0.5">{mockArtisan.craft} • {mockArtisan.location}</p>
+                                        <h2 className="font-display text-xl font-bold text-[--text-primary]">{name || user?.email}</h2>
+                                        <p className="text-[--text-secondary] text-sm mt-0.5">
+                                            {craft || 'Your craft'}{location && ' • '}{location}
+                                        </p>
                                     </div>
                                     <button onClick={() => setEditing(true)} className="px-4 py-2 rounded-xl border border-[--border-warm] text-[--text-secondary] text-xs font-medium hover:border-[--terracotta] hover:text-[--terracotta] transition-all">
-                                        ✏️ Edit
+                                        <Edit2 size={12} className="inline mr-1" /> Edit
                                     </button>
                                 </div>
-                                <p className="text-sm text-[--text-secondary] leading-relaxed">{bio}</p>
+                                <p className="text-sm text-[--text-secondary] leading-relaxed">
+                                    {bio || 'Tell buyers about your craft journey, inspiration, and what makes your work special.'}
+                                </p>
                                 <div className="flex flex-wrap gap-2">
                                     {badges.map(b => (
-                                        <span key={b} className="text-xs px-3 py-1 rounded-full badge-saffron">{b}</span>
+                                        <span key={b} className="text-xs px-3 py-1 rounded-full badge-saffron flex items-center gap-1">
+                                            <Award size={10} /> {b}
+                                        </span>
                                     ))}
                                 </div>
                             </>
@@ -83,12 +156,14 @@ export default function ProfilePage() {
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {[
-                    { label: 'Products', value: mockArtisan.totalProducts, icon: '🏺' },
-                    { label: 'Orders', value: mockArtisan.totalSales, icon: '📦' },
-                    { label: 'Revenue', value: formatCurrency(mockArtisan.totalRevenue), icon: '💰' },
+                    { label: 'Products', value: 0, icon: Package },
+                    { label: 'Orders', value: 0, icon: ShoppingBag },
+                    { label: 'Revenue', value: formatCurrency(0), icon: IndianRupee },
                 ].map(s => (
                     <div key={s.label} className="bg-white rounded-2xl p-4 border border-[--border-warm] text-center">
-                        <div className="text-xl mb-1">{s.icon}</div>
+                        <div className="flex items-center justify-center mb-1">
+                            <s.icon size={18} className="text-[--terracotta]" />
+                        </div>
                         <div className="font-bold text-lg text-[--text-primary]">{s.value}</div>
                         <div className="text-xs text-[--text-secondary]">{s.label}</div>
                     </div>
@@ -100,13 +175,13 @@ export default function ProfilePage() {
                 <h3 className="font-semibold text-[--text-primary] mb-4">Contact Information</h3>
                 <div className="space-y-3">
                     {[
-                        { label: 'Email', value: mockArtisan.email, icon: '✉️' },
-                        { label: 'Phone', value: mockArtisan.phone, icon: '📱' },
-                        { label: 'Language', value: mockArtisan.language.toUpperCase(), icon: '🌐' },
-                        { label: 'Member since', value: new Date(mockArtisan.joinedAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'long' }), icon: '📅' },
+                        { label: 'Email', value: user?.email || '-', icon: Mail },
+                        { label: 'Phone', value: phone || '-', icon: Phone },
+                        { label: 'Language', value: (language || 'en').toUpperCase(), icon: Globe2 },
+                        { label: 'Member since', value: joinedAt ? joinedAt.toLocaleDateString('en-IN', { year: 'numeric', month: 'long' }) : '-', icon: CalendarRange },
                     ].map(item => (
                         <div key={item.label} className="flex items-center gap-3 py-2 border-b border-[--border-warm] last:border-0">
-                            <span>{item.icon}</span>
+                            <item.icon size={14} className="text-[--terracotta]" />
                             <span className="text-xs text-[--text-secondary] w-24">{item.label}</span>
                             <span className="text-sm text-[--text-primary] font-medium">{item.value}</span>
                         </div>

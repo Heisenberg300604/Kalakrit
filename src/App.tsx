@@ -1,8 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './hooks/useLanguage';
+import { AuthProvider } from './hooks/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import MarketplacePage from './pages/MarketplacePage';
+import ProductDetailPage from './pages/ProductDetailPage';
 import DashboardLayout from './pages/dashboard/DashboardLayout';
 import DashboardHome from './pages/dashboard/DashboardHome';
 import VoiceListing from './pages/dashboard/VoiceListing';
@@ -18,28 +22,36 @@ import SettingsPage from './pages/dashboard/SettingsPage';
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<DashboardHome />} />
-            <Route path="voice" element={<VoiceListing />} />
-            <Route path="products" element={<ProductManagement />} />
-            <Route path="pricing" element={<PricingInsights />} />
-            <Route path="marketplace" element={<MarketplaceExport />} />
-            <Route path="showcase" element={<ProductShowcase />} />
-            <Route path="guide" element={<AICommerceGuide />} />
-            <Route path="analytics" element={<AnalyticsDashboard />} />
-            <Route path="orders" element={<OrdersPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </LanguageProvider>
+    <AuthProvider>
+      <LanguageProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/marketplace/:id" element={<ProductDetailPage />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<DashboardHome />} />
+              <Route path="voice" element={<VoiceListing />} />
+              <Route path="products" element={<ProductManagement />} />
+              <Route path="pricing" element={<PricingInsights />} />
+              <Route path="marketplace" element={<MarketplaceExport />} />
+              <Route path="showcase" element={<ProductShowcase />} />
+              <Route path="guide" element={<AICommerceGuide />} />
+              <Route path="analytics" element={<AnalyticsDashboard />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </LanguageProvider>
+    </AuthProvider>
   );
 }

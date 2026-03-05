@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { Mic, Loader2, ArrowLeft } from 'lucide-react';
+import { Mic, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../hooks/AuthContext';
 import type { Language } from '../types';
 
 const languages: { code: Language; label: string; native: string }[] = [
@@ -20,19 +21,56 @@ const crafts = [
 export default function SignupPage() {
     const [lang, setLang] = useState<Language>('en');
     const [loading, setLoading] = useState(false);
-    const [step, setStep] = useState(1);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState(false);
 
-    function handleNext(e: React.FormEvent) {
+    // Form state
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [craft, setCraft] = useState('');
+    const [location, setLocation] = useState('');
+    const [password, setPassword] = useState('');
+
+    const { signUp } = useAuth();
+    const navigate = useNavigate();
+
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        setStep(2);
+        setError('');
+        setLoading(true);
+
+        const { error } = await signUp(email, password, {
+            name,
+            phone,
+            craft,
+            location,
+            language: lang,
+        });
+        if (error) {
+            setError(error);
+            setLoading(false);
+        } else {
+            setSuccess(true);
+            setLoading(false);
+            // Auto-redirect after showing success message
+            setTimeout(() => navigate('/login'), 2500);
+        }
     }
 
-    function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
-        setTimeout(() => {
-            window.location.href = '/dashboard';
-        }, 1500);
+    if (success) {
+        return (
+            <div className="min-h-screen gradient-hero flex items-center justify-center px-4">
+                <div className="w-full max-w-md glass rounded-3xl p-10 shadow-2xl border border-[--border-warm] text-center">
+                    <CheckCircle2 size={48} className="mx-auto text-green-500 mb-4" />
+                    <h2 className="font-display text-2xl font-bold text-[--text-primary] mb-2">Account Created!</h2>
+                    <p className="text-[--text-secondary] text-sm mb-1">
+                        Check your email to confirm your account, then sign in.
+                    </p>
+                    <p className="text-xs text-[--text-secondary]">Redirecting to login...</p>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -51,81 +89,66 @@ export default function SignupPage() {
                     <p className="text-[--text-secondary] mt-2">Start your digital journey today — free forever</p>
                 </div>
 
-                {/* Step indicators */}
-                <div className="flex items-center justify-center gap-2 mb-8">
-                    {[1, 2].map((s) => (
-                        <div key={s} className={`flex items-center gap-2 ${s < 2 ? 'flex-1' : ''}`}>
-                            <div
-                                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${step >= s ? 'text-white shadow' : 'text-[--text-secondary] border border-[--border-warm] bg-white'}`}
-                                style={step >= s ? { background: 'linear-gradient(135deg, #C4622D, #F4A026)' } : {}}
-                            >
-                                {s}
-                            </div>
-                            {s < 2 && <div className={`flex-1 h-0.5 transition-all ${step > s ? 'bg-[--terracotta]' : 'bg-[--border-warm]'}`}></div>}
-                        </div>
-                    ))}
-                </div>
-
                 <div className="glass rounded-3xl p-8 shadow-2xl border border-[--border-warm]">
-                    {step === 1 ? (
-                        <form onSubmit={handleNext} className="space-y-4">
-                            <h2 className="font-semibold text-[--text-primary] text-lg mb-4">Your Basic Details</h2>
-                            <div>
-                                <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Full Name</label>
-                                <input type="text" placeholder="e.g. Vartika Singh" required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Email Address</label>
-                                <input type="email" placeholder="your@email.com" required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Phone Number</label>
-                                <input type="tel" placeholder="+91 98765 43210" required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Preferred Language</label>
-                                <div className="grid grid-cols-5 gap-2">
-                                    {languages.map((l) => (
-                                        <button key={l.code} type="button" onClick={() => setLang(l.code)}
-                                            className={`p-2 rounded-xl border text-xs font-medium transition-all ${lang === l.code ? 'border-[--terracotta] bg-[--terracotta] text-white' : 'border-[--border-warm] bg-white/60 text-[--text-secondary] hover:border-[--terracotta]/50'}`}>
-                                            {l.native}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            <button type="submit" className="w-full py-3.5 rounded-xl text-white font-semibold text-base transition-all hover:shadow-lg hover:-translate-y-0.5 mt-2 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                                Continue
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            </button>
-                        </form>
-                    ) : (
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <h2 className="font-semibold text-[--text-primary] text-lg mb-4">About Your Craft</h2>
-                            <div>
-                                <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Type of Craft</label>
-                                <select required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all">
-                                    <option value="">Select your craft...</option>
-                                    {crafts.map(c => <option key={c} value={c}>{c}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Your Location</label>
-                                <input type="text" placeholder="e.g. Varanasi, Uttar Pradesh" required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Password</label>
-                                <input type="password" placeholder="Create a strong password" required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
-                            </div>
-                            <div className="flex gap-3 mt-2">
-                                <button type="button" onClick={() => setStep(1)} className="flex-1 py-3.5 rounded-xl border border-[--border-warm] text-[--text-secondary] font-semibold hover:bg-white/60 transition-all flex items-center justify-center gap-1.5">
-                                    <ArrowLeft size={15} /> Back
-                                </button>
-                                <button type="submit" disabled={loading} className="flex-1 py-3.5 rounded-xl text-white font-semibold transition-all hover:shadow-lg disabled:opacity-70 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                                    {loading ? <><Loader2 size={16} className="animate-spin" /> Creating...</> : <><Mic size={16} /> Start Selling</>}
-                                </button>
-                            </div>
-                        </form>
+                    {error && (
+                        <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 flex items-center gap-2 text-sm text-red-700">
+                            <AlertCircle size={16} className="shrink-0" />
+                            {error}
+                        </div>
                     )}
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <h2 className="font-semibold text-[--text-primary] text-lg mb-4">Your Details</h2>
+                        <div>
+                            <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Full Name</label>
+                            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Vartika Singh" required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Email Address</label>
+                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Phone Number</label>
+                            <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 98765 43210" required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Type of Craft</label>
+                            <select value={craft} onChange={e => setCraft(e.target.value)} required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all">
+                                <option value="">Select your craft...</option>
+                                {crafts.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Your Location</label>
+                            <input type="text" value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. Varanasi, Uttar Pradesh" required className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Preferred Language</label>
+                            <div className="flex flex-wrap gap-2">
+                                {languages.map((l) => (
+                                    <button
+                                        key={l.code}
+                                        type="button"
+                                        onClick={() => setLang(l.code)}
+                                        className={`px-3 py-2 rounded-full border text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 ${
+                                            lang === l.code
+                                                ? 'border-[--terracotta] bg-[--terracotta] text-white shadow-sm'
+                                                : 'border-[--border-warm] bg-white/60 text-[--text-secondary] hover:border-[--terracotta]/50'
+                                        }`}
+                                    >
+                                        <span>{l.native}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Password</label>
+                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Create a strong password (min 6 chars)" required minLength={6} className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all" />
+                        </div>
+                        <button type="submit" disabled={loading} className="w-full py-3.5 rounded-xl text-white font-semibold transition-all hover:shadow-lg disabled:opacity-70 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
+                            {loading ? <><Loader2 size={16} className="animate-spin" /> Creating...</> : <><Mic size={16} /> Create Account</>}
+                        </button>
+                    </form>
 
                     <div className="mt-6 pt-4 border-t border-[--border-warm]">
                         <p className="text-center text-sm text-[--text-secondary]">

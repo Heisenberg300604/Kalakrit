@@ -1,12 +1,13 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import {
     LayoutDashboard, Mic, Package, ShoppingBag, TrendingUp, Globe,
     Rotate3D, Bot, BarChart2, User, Settings, LogOut, Bell, Menu, X, Search,
 } from 'lucide-react';
 import { useLang } from '../../hooks/useLanguage';
-import { mockArtisan } from '../../services/mockData';
+import { useAuth } from '../../hooks/AuthContext';
 import type { Language } from '../../types';
+import supabase from '../../utils/supabase';
 
 const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -35,13 +36,44 @@ const languages: { code: Language; label: string }[] = [
 
 export default function DashboardLayout() {
     const location = useLocation();
+    const navigate = useNavigate();
     const { lang, setLang } = useLang();
+    const { user, signOut } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [profileName, setProfileName] = useState('');
+
+    useEffect(() => {
+        async function loadProfileName() {
+            if (!user) {
+                setProfileName('');
+                return;
+            }
+
+            const { data } = await supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('id', user.id)
+                .maybeSingle();
+
+            setProfileName(data?.full_name || user.user_metadata?.full_name || '');
+        }
+
+        loadProfileName();
+    }, [user]);
 
     const isActive = (path: string, end?: boolean) => {
         if (end) return location.pathname === path;
         return location.pathname.startsWith(path) && path !== '/dashboard';
     };
+
+    const userInitial = user?.email?.charAt(0).toUpperCase() || 'U';
+    const userEmail = user?.email || 'artisan@kalakrit.in';
+    const userName = profileName || userEmail.split('@')[0];
+
+    async function handleLogout() {
+        await signOut();
+        navigate('/login');
+    }
 
     return (
         <div className="flex h-screen bg-[--warm-white] overflow-hidden">
@@ -65,15 +97,15 @@ export default function DashboardLayout() {
                     </button>
                 </div>
 
-                {/* Artisan badge */}
+                {/* User badge */}
                 <div className="px-4 py-3 mx-3 my-3 rounded-xl" style={{ background: 'linear-gradient(135deg, rgba(196,98,45,0.07), rgba(244,160,38,0.05))' }}>
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full flex items-center justify-center text-base font-bold text-white" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                            {mockArtisan.name.charAt(0)}
+                            {userInitial}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold text-[--text-primary] truncate">{mockArtisan.name}</div>
-                            <div className="text-xs text-[--text-secondary] truncate">{mockArtisan.craft}</div>
+                            <div className="text-sm font-semibold text-[--text-primary] truncate capitalize">{userName}</div>
+                            <div className="text-xs text-[--text-secondary] truncate">{userEmail}</div>
                         </div>
                     </div>
                 </div>
@@ -116,10 +148,13 @@ export default function DashboardLayout() {
                             </Link>
                         );
                     })}
-                    <Link to="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[--text-secondary] hover:bg-red-50 hover:text-red-500 transition-all">
+                    <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[--text-secondary] hover:bg-red-50 hover:text-red-500 transition-all"
+                    >
                         <LogOut size={16} />
-                        <span>Exit Dashboard</span>
-                    </Link>
+                        <span>Sign Out</span>
+                    </button>
                 </div>
             </aside>
 
@@ -162,7 +197,7 @@ export default function DashboardLayout() {
                         </button>
 
                         <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                            V
+                            {userInitial}
                         </div>
                     </div>
                 </header>

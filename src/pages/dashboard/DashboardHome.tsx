@@ -1,12 +1,18 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { mockArtisan, mockOrders, mockAnalytics, mockActivity } from '../../services/mockData';
 import { formatCurrency, formatNumber, timeAgo } from '../../lib/utils';
+import { Package, IndianRupee, Eye, ShoppingBag } from 'lucide-react';
+import { useAuth } from '../../hooks/AuthContext';
+import supabase from '../../utils/supabase';
 
-const StatCard = ({ icon, label, value, change, color }: { icon: string; label: string; value: string; change: string; color: string }) => (
+const StatCard = ({ icon: Icon, label, value, change, color }: { icon: React.ComponentType<{ size?: number }>; label: string; value: string; change: string; color: string }) => (
     <div className="bg-white rounded-2xl p-5 border border-[--border-warm] card-hover">
         <div className="flex items-start justify-between mb-4">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${color}`}>{icon}</div>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${color}`}>
+                <Icon size={18} />
+            </div>
             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${change.startsWith('+') ? 'badge-green' : 'badge-terracotta'}`}>{change}</span>
         </div>
         <div className="text-2xl font-bold text-[--text-primary] mt-1">{value}</div>
@@ -15,6 +21,25 @@ const StatCard = ({ icon, label, value, change, color }: { icon: string; label: 
 );
 
 export default function DashboardHome() {
+    const { user } = useAuth();
+    const [profileName, setProfileName] = useState('');
+
+    useEffect(() => {
+        async function loadProfileName() {
+            if (!user) return;
+            const { data } = await supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('id', user.id)
+                .maybeSingle();
+
+            setProfileName(data?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Artisan');
+        }
+
+        loadProfileName();
+    }, [user]);
+
+    const firstName = profileName.split(' ')[0] || 'Artisan';
     const aiSuggestions = [
         { icon: '💰', text: 'Raise Banarasi Silk price by ₹1,200 — festival season demand is up 45%', action: 'View Pricing' },
         { icon: '📸', text: 'Add 2 more photos to Warli Painting to increase views by 180%', action: 'Edit Product' },
@@ -27,7 +52,7 @@ export default function DashboardHome() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="font-display text-2xl sm:text-3xl font-bold text-[--text-primary]">
-                        Namaste, {mockArtisan.name.split(' ')[0]}! 🙏
+                        Namaste, {firstName}! 🙏
                     </h1>
                     <p className="text-[--text-secondary] text-sm mt-1">Here's what's happening with your craft business today.</p>
                 </div>
@@ -38,10 +63,10 @@ export default function DashboardHome() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard icon="🏺" label="Total Products" value={String(mockArtisan.totalProducts)} change="+3 this month" color="bg-orange-50 text-orange-500" />
-                <StatCard icon="💰" label="Total Revenue" value={formatCurrency(mockArtisan.totalRevenue)} change="+18%" color="bg-green-50 text-green-500" />
-                <StatCard icon="👁️" label="Total Views" value={formatNumber(4141)} change="+32%" color="bg-blue-50 text-blue-500" />
-                <StatCard icon="📦" label="Orders (Month)" value={String(mockArtisan.totalSales)} change="+24%" color="bg-purple-50 text-purple-500" />
+                <StatCard icon={Package} label="Total Products" value={String(mockArtisan.totalProducts)} change="+3 this month" color="bg-orange-50 text-orange-500" />
+                <StatCard icon={IndianRupee} label="Total Revenue" value={formatCurrency(mockArtisan.totalRevenue)} change="+18%" color="bg-green-50 text-green-500" />
+                <StatCard icon={Eye} label="Total Views" value={formatNumber(4141)} change="+32%" color="bg-blue-50 text-blue-500" />
+                <StatCard icon={ShoppingBag} label="Orders (Month)" value={String(mockArtisan.totalSales)} change="+24%" color="bg-purple-50 text-purple-500" />
             </div>
 
             {/* Charts Row */}

@@ -1,16 +1,30 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { Mic, Loader2, Smartphone, KeyRound } from 'lucide-react';
+import { Mic, Loader2, AlertCircle } from 'lucide-react';
+import { useAuth } from '../hooks/AuthContext';
 
 export default function LoginPage() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const { signIn } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = (location.state as { from?: Location })?.from?.pathname || '/dashboard';
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        setError('');
         setLoading(true);
-        setTimeout(() => {
-            window.location.href = '/dashboard';
-        }, 1200);
+
+        const { error } = await signIn(email, password);
+        if (error) {
+            setError(error);
+            setLoading(false);
+        } else {
+            navigate(from, { replace: true });
+        }
     }
 
     return (
@@ -29,23 +43,23 @@ export default function LoginPage() {
                     <p className="text-[--text-secondary] mt-2">Sign in to your artisan workspace</p>
                 </div>
 
-                {/* Prototype demo notice */}
-                <div className="mb-5 px-4 py-3.5 rounded-2xl border border-amber-300 bg-amber-50">
-                    <p className="text-sm font-semibold text-amber-900 mb-1">Prototype — Demo Access</p>
-                    <p className="text-sm text-amber-800 leading-relaxed">
-                        This is a working prototype. Just type <strong>anything</strong> in the fields and press
-                        Sign In to explore the full dashboard. No real account is needed at this stage.
-                        Backend integration will follow after Round 1 selection.
-                    </p>
-                </div>
-
                 <div className="glass rounded-3xl p-8 shadow-2xl border border-[--border-warm]">
+                    {error && (
+                        <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 flex items-center gap-2 text-sm text-red-700">
+                            <AlertCircle size={16} className="flex-shrink-0" />
+                            {error}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Email or Phone</label>
+                            <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Email</label>
                             <input
-                                type="text"
+                                type="email"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
                                 placeholder="e.g. vartika@kalakrit.in"
+                                required
                                 className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all"
                             />
                         </div>
@@ -53,10 +67,12 @@ export default function LoginPage() {
                             <label className="block text-sm font-medium text-[--text-primary] mb-1.5">Password</label>
                             <input
                                 type="password"
-                                placeholder="Type anything to proceed"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                placeholder="Enter your password"
+                                required
                                 className="w-full px-4 py-3 rounded-xl border border-[--border-warm] bg-white/60 text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 focus:border-[--terracotta] transition-all"
                             />
-                            <a href="#" className="text-xs text-[--terracotta] mt-1.5 block text-right hover:underline">Forgot password?</a>
                         </div>
                         <button
                             type="submit"
@@ -67,7 +83,7 @@ export default function LoginPage() {
                             {loading ? (
                                 <><Loader2 size={18} className="animate-spin" /> Signing in...</>
                             ) : (
-                                <><Mic size={18} /> Sign In to Dashboard</>
+                                <><Mic size={18} /> Sign In</>
                             )}
                         </button>
                     </form>
@@ -77,22 +93,6 @@ export default function LoginPage() {
                             New artisan?{' '}
                             <Link to="/signup" className="text-[--terracotta] font-semibold hover:underline">Create free account</Link>
                         </p>
-                    </div>
-
-                    <div className="mt-4">
-                        <div className="relative flex items-center gap-3 my-4">
-                            <div className="flex-1 border-t border-[--border-warm]"></div>
-                            <span className="text-xs text-[--text-secondary]">or continue with</span>
-                            <div className="flex-1 border-t border-[--border-warm]"></div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <button className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[--border-warm] text-sm text-[--text-secondary] hover:bg-white/60 transition-colors">
-                                <Smartphone size={15} /> Phone OTP
-                            </button>
-                            <button className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[--border-warm] text-sm text-[--text-secondary] hover:bg-white/60 transition-colors">
-                                <KeyRound size={15} /> Google
-                            </button>
-                        </div>
                     </div>
                 </div>
 
