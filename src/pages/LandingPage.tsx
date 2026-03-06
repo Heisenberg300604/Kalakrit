@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
-    Mic, Globe, BookOpen, TrendingUp, Package,
-    BarChart2, ShieldCheck, Languages, Menu, X
+    Mic, Globe, BookOpen, Languages, Menu, X
 } from 'lucide-react';
 import { useLang } from '../hooks/useLanguage';
 import { useAuth } from '../hooks/AuthContext';
@@ -16,61 +15,11 @@ const languages: { code: Language; label: string; native: string }[] = [
     { code: 'bn', label: 'Bengali', native: 'বাংলা' },
 ];
 
-const features = [
-    {
-        icon: Mic,
-        title: 'Voice-to-Listing',
-        desc: 'Speak your product details in any Indian language. AI creates a full, marketplace-ready listing within seconds.',
-    },
-    {
-        icon: BookOpen,
-        title: 'AI Storytelling',
-        desc: 'Every craft carries a story. AI weaves your heritage into compelling narratives that help buyers connect and convert.',
-    },
-    {
-        icon: TrendingUp,
-        title: 'Smart Pricing',
-        desc: 'Data-driven pricing recommendations based on live demand, seasonality, and competitor analysis across platforms.',
-    },
-    {
-        icon: Globe,
-        title: 'Multi-Marketplace',
-        desc: 'One click to publish your listing to Amazon, Etsy, Flipkart, and Meesho simultaneously.',
-    },
-    {
-        icon: BarChart2,
-        title: 'Market Insights',
-        desc: 'Understand seasonal demand cycles, buyer demographics, and emerging trends relevant to your craft.',
-    },
-    {
-        icon: Package,
-        title: '360° Showcase',
-        desc: 'Multi-angle interactive product viewer with an AR preview option to showcase every minute detail.',
-    },
-    {
-        icon: ShieldCheck,
-        title: 'AI Commerce Guide',
-        desc: 'A built-in business mentor for pricing advice, product naming, marketing strategy, and craft storytelling.',
-    },
-    {
-        icon: Languages,
-        title: 'Regional Language',
-        desc: 'Full UI support for Hindi, Tamil, Telugu, Bengali, and English — for artisans who think in their mother tongue.',
-    },
-];
+// Removed unused features array
 
-const steps = [
-    { num: '01', title: 'Kala (Craft)', desc: 'Speak your craft details in your mother tongue. AI creates a professional product listing with photos, descriptions, and tags.' },
-    { num: '02', title: 'Kathan (Story)', desc: 'AI weaves your heritage into compelling narratives that connect with global buyers and preserve cultural stories.' },
-    { num: '03', title: 'Karobaar (Business)', desc: 'Smart pricing, multi-marketplace publishing, and business insights help you grow your craft business globally.' },
-];
+// Removed unused steps array
 
-const stats = [
-    { value: '10,000+', label: 'Artisans Empowered' },
-    { value: '₹2.4 Cr+', label: 'Revenue Generated' },
-    { value: '46', label: 'Regional Languages' },
-    { value: '4', label: 'Marketplace Partners' },
-];
+// Removed unused stats array
 
 const problems = [
     {

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Languages, Menu, X } from 'lucide-react';
+import { Languages } from 'lucide-react';
 import { useLang } from '../hooks/useLanguage';
 import { useAuth } from '../hooks/AuthContext';
 import type { Language } from '../types';
@@ -41,7 +41,9 @@ const SectionFadeIn = ({ children, delay = 0 }: { children: React.ReactNode; del
         const current = document.getElementById(`fade-${delay}`);
         if (current) observer.observe(current);
 
-        return () => current && observer.unobserve(current);
+        return () => {
+            if (current) observer.unobserve(current);
+        };
     }, [delay]);
 
     return (
@@ -59,11 +61,11 @@ const SectionFadeIn = ({ children, delay = 0 }: { children: React.ReactNode; del
 };
 
 export default function LandingPageNew() {
-    const { lang, setLang, t } = useLang();
+    const { lang, setLang } = useLang();
     const { user } = useAuth();
     const [scrolled, setScrolled] = useState(false);
     const [showLangMenu, setShowLangMenu] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    // Removed unused mobile menu state
     const [selectedTab, setSelectedTab] = useState('story');
     
     // Form state for all tabs
