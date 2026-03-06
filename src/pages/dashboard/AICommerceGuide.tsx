@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { aiChatResponses, mockChatHistoryData, sampleGuidance } from '../../services/aiGuideData';
 import type { ChatMessage } from '../../types';
-import { TrendingUp, AlertCircle } from 'lucide-react';
+import { TrendingUp, AlertCircle, Mic } from 'lucide-react';
+import VoiceToText from "../../components/VoiceToText";
 
 const quickQuestions = [
     { icon: '💰', label: 'Pricing advice', key: 'pricing' },
@@ -23,35 +24,54 @@ export default function AICommerceGuide() {
 
     useEffect(scrollToBottom, [messages, typing]);
 
-    function getReply(text: string): string {
-        const lower = text.toLowerCase();
-        for (const [key, val] of Object.entries(aiChatResponses)) {
-            if (lower.includes(key)) return val;
-        }
-        return `Great question! As your AI Commerce Guide, I'm here to help. Could you ask me something specific about pricing, marketing, product naming, or your craft story? I'll give you personalized advice based on current market trends. 🙏`;
+   function getReply(text: string): string {
+    const lower = text.toLowerCase();
+    for (const [key, val] of Object.entries(aiChatResponses)) {
+        if (lower.includes(key)) return val;
     }
+    return `Great question! As your AI Commerce Guide, I'm here to help. Could you ask me something specific about pricing, marketing, product naming, or your craft story? I'll give you personalized advice based on current market trends. 🙏`;
+}
+
+/* ADD THIS FUNCTION RIGHT BELOW */
+function speak(text: string) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-IN";
+    window.speechSynthesis.speak(speech);
+}
 
     async function send(text: string) {
-        if (!text.trim()) return;
-        const userMsg: ChatMessage = {
-            id: String(Date.now()),
-            role: 'user',
-            content: text,
-            timestamp: new Date().toISOString(),
-        };
-        setMessages(m => [...m, userMsg]);
-        setInput('');
-        setTyping(true);
-        await new Promise(r => setTimeout(r, 1200));
-        const reply: ChatMessage = {
-            id: String(Date.now() + 1),
-            role: 'assistant',
-            content: getReply(text),
-            timestamp: new Date().toISOString(),
-        };
-        setMessages(m => [...m, reply]);
-        setTyping(false);
-    }
+    if (!text.trim()) return;
+
+    const userMsg: ChatMessage = {
+        id: String(Date.now()),
+        role: 'user',
+        content: text,
+        timestamp: new Date().toISOString(),
+    };
+
+    // show user message
+    setMessages(m => [...m, userMsg]);
+    setInput('');
+    setTyping(true);
+
+    // simulate AI thinking
+    await new Promise(r => setTimeout(r, 1200));
+
+    const reply: ChatMessage = {
+        id: String(Date.now() + 1),
+        role: 'assistant',
+        content: getReply(text),
+        timestamp: new Date().toISOString(),
+    };
+
+    // show AI reply
+    setMessages(m => [...m, reply]);
+
+    // 🔊 speak the reply
+    speak(reply.content);
+
+    setTyping(false);
+}
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -138,20 +158,48 @@ export default function AICommerceGuide() {
                 </div>
 
                 {/* Input */}
-                <form onSubmit={handleSubmit} className="p-3 border-t border-[--border-warm] flex gap-2">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={e => setInput(e.target.value)}
-                        placeholder="Ask about pricing, marketing, product names, stories..."
-                        className="flex-1 px-4 py-2.5 rounded-xl border border-[--border-warm] text-sm text-[--text-primary] placeholder-[--text-secondary]/60 focus:outline-none focus:ring-2 focus:ring-[--terracotta]/30 transition-all bg-[--warm-white]"
-                    />
-                    <button type="submit" disabled={!input.trim() || typing}
-                        className="px-4 py-2.5 rounded-xl text-white font-semibold text-sm disabled:opacity-40 transition-all"
-                        style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
-                        Send →
-                    </button>
-                </form>
+                <form onSubmit={handleSubmit} className="p-3 border-t border-[--border-warm] flex gap-2 items-center">
+
+    <input
+        type="text"
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        placeholder="Ask about pricing, marketing, product names, stories..."
+        className="flex-1 px-4 py-2.5 rounded-xl border border-[--border-warm] text-sm text-[--text-primary]"
+    />
+
+    {/* Mic button */}
+    <button
+        type="button"
+        onClick={() => {
+            const SpeechRecognition =
+                (window as any).SpeechRecognition ||
+                (window as any).webkitSpeechRecognition;
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = "en-IN";
+            recognition.start();
+
+            recognition.onresult = (event: any) => {
+                const transcript = event.results[0][0].transcript;
+                setInput(transcript);
+            };
+        }}
+        className="p-2 rounded-xl border border-[--border-warm] hover:bg-[--warm-white]"
+    >
+        <Mic size={18} className="text-[--terracotta]" />
+    </button>
+
+    <button
+        type="submit"
+        disabled={!input.trim() || typing}
+        className="px-4 py-2.5 rounded-xl text-white font-semibold text-sm disabled:opacity-40"
+        style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}
+    >
+        Send →
+    </button>
+
+</form>
             </div>
                 </div>
             )}
