@@ -298,12 +298,12 @@ export default function LandingPageNew() {
                                     to="/signup"
                                     className="px-8 py-4 rounded-full font-medium text-white transition-all duration-300 hover:shadow-lg hover:scale-105"
                                     style={{ 
-                                        borderColor: '#F5F2EA', 
+                                        borderColor: '#331414', 
                                         color: '#F5F2EA',
-                                        backgroundColor: 'transparent'
+                                        backgroundColor: '#331414'
                                     }}
                             
-                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#331414'}
+                                   
                                 >
                                     Start Your Legacy
                                 </Link>
