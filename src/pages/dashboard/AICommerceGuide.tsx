@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { aiChatResponses, mockChatHistoryData, sampleGuidance } from '../../services/aiGuideData';
 import type { ChatMessage } from '../../types';
 import { TrendingUp, AlertCircle, Mic } from 'lucide-react';
-import VoiceToText from "../../components/VoiceToText";
 
 const quickQuestions = [
     { icon: '💰', label: 'Pricing advice', key: 'pricing' },
