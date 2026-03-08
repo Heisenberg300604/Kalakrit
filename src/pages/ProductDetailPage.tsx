@@ -41,15 +41,28 @@ export default function ProductDetailPage() {
         setLoading(true);
         const { data, error } = await supabase
             .from('products')
-            .select('*, profiles(full_name, location, craft)')
+            .select('*')
             .eq('id', productId)
             .single();
 
         if (error || !data) {
             setError('Product not found');
-        } else {
-            setProduct(data as any);
+            setLoading(false);
+            return;
         }
+
+        // Fetch profile separately (products.user_id → profiles.id via auth.users)
+        let profile = null;
+        if (data.user_id) {
+            const { data: profileData } = await supabase
+                .from('profiles')
+                .select('full_name, location, craft')
+                .eq('id', data.user_id)
+                .single();
+            profile = profileData;
+        }
+
+        setProduct({ ...data, profiles: profile } as any);
         setLoading(false);
     }
 

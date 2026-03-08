@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, ShoppingBag, Edit2, Trash2, Package, Sparkles } from 'lucide-react';
+import { Eye, ShoppingBag, Trash2, Package, Sparkles, Globe, EyeOff } from 'lucide-react';
 import { formatCurrency } from '../../lib/utils';
 import supabase from '../../utils/supabase';
 
@@ -26,7 +26,19 @@ export default function ProductManagement() {
 
     const filtered = products.filter(p => filter === 'all' || p.status === filter);
 
-    function handleDelete(id: string) {
+    async function handleTogglePublish(id: string, currentStatus: string) {
+        const newStatus = currentStatus === 'published' ? 'draft' : 'published';
+        const { error } = await supabase
+            .from('products')
+            .update({ status: newStatus })
+            .eq('id', id);
+        if (!error) {
+            setProducts(products.map(p => p.id === id ? { ...p, status: newStatus } : p));
+        }
+    }
+
+    async function handleDelete(id: string) {
+        await supabase.from('products').delete().eq('id', id);
         setProducts(products.filter(p => p.id !== id));
         setDeleteId(null);
     }
@@ -97,8 +109,18 @@ export default function ProductManagement() {
                                 </div>
                             </div>
                             <div className="flex gap-2 mt-4">
-                                <button className="flex-1 py-2 rounded-xl text-xs font-semibold border border-[--border-warm] text-[--text-secondary] hover:border-[--terracotta] hover:text-[--terracotta] transition-all inline-flex items-center justify-center gap-1.5">
-                                    <Edit2 size={12} /> Edit
+                                <button
+                                    onClick={() => handleTogglePublish(product.id, product.status)}
+                                    className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all inline-flex items-center justify-center gap-1.5 ${
+                                        product.status === 'published'
+                                            ? 'border-amber-200 text-amber-600 hover:border-amber-400 hover:bg-amber-50'
+                                            : 'border-green-200 text-green-600 hover:border-green-400 hover:bg-green-50'
+                                    }`}
+                                >
+                                    {product.status === 'published'
+                                        ? <><EyeOff size={12} /> Unpublish</>
+                                        : <><Globe size={12} /> Publish</>
+                                    }
                                 </button>
                                 <button
                                     onClick={() => setDeleteId(product.id)}

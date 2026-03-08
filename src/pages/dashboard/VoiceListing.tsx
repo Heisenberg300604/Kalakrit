@@ -220,7 +220,7 @@ export default function VoiceListing() {
                 suggested_price: editPrice,
                 transcript: transcript,
                 language: selectedLang,
-                status: 'draft',
+                status: 'published',
             }).select('id').single();
 
             if (dbError) {
@@ -294,7 +294,7 @@ export default function VoiceListing() {
                 <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
                     <CheckCircle2 size={40} className="mx-auto text-green-500 mb-2" />
                     <h3 className="font-semibold text-green-800 text-lg">Product Saved Successfully!</h3>
-                    <p className="text-green-700 text-sm mt-1">Your listing has been saved as a draft in your products</p>
+                    <p className="text-green-700 text-sm mt-1">Your listing is now live on the marketplace!</p>
                     <button onClick={resetAll} className="mt-4 px-6 py-2 rounded-xl text-white text-sm font-semibold inline-flex items-center gap-2" style={{ background: 'linear-gradient(135deg, #C4622D, #F4A026)' }}>
                         <Mic size={16} /> Add Another Product
                     </button>
